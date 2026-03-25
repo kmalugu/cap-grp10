@@ -1,0 +1,24 @@
+{
+  "BTech": {
+    "domestic": {
+      "tuition_fee": 150000,
+      "hostel_fee": 60000,
+      "total": 210000,
+      "scholarship": "Merit-based (Top 10%)"
+    },
+    "international": {
+      "tuition_fee": 300000,
+      "hostel_fee": 80000,
+      "total": 380000,
+      "scholarship": "Limited scholarships available"
+    }
+  },
+  "MBA": {
+    "domestic": {
+      "tuition_fee": 200000,
+      "hostel_fee": 70000,
+      "total": 270000,
+      "scholarship": "Entrance exam based"
+    }
+  }
+}

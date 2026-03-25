@@ -1,0 +1,982 @@
+PROJECT VIVA CONCEPTS
+University AI Assistant
+
+This file explains the main technical concepts used in the project in simple language for viva preparation.
+
+
+1. Artificial Intelligence Assistant
+
+What it means:
+- An AI assistant is a system that takes user input, understands it, and gives a useful response.
+
+How it is used here:
+- The project acts as a university assistant.
+- It answers questions about courses, fees, timetables, faculty, academic calendar, and university policies.
+
+Important viva line:
+- "This is an AI-based university assistant that combines structured data lookup, RAG, memory, and an LLM to answer student queries."
+
+
+2. Large Language Model (LLM)
+
+What it means:
+- An LLM is a model trained on large amounts of text to understand and generate language.
+
+How it is used here:
+- The project uses Gemini through LangChain.
+- The LLM generates the final natural-language answer.
+
+Why it is useful:
+- It can understand user questions written in normal language.
+- It can summarize, explain, and generate human-like responses.
+
+Limitation:
+- LLMs can hallucinate, meaning they may generate answers that sound correct but are not actually based on real data.
+
+Project solution:
+- The project reduces hallucination by using RAG and by adding a disclaimer when the answer is not found in official documents.
+
+Viva line:
+- "The LLM is used for response generation, but we improve reliability by grounding it with retrieved documents and memory."
+
+
+3. Retrieval-Augmented Generation (RAG)
+
+What it means:
+- RAG is a technique where the system first retrieves relevant documents and then gives them to the LLM to generate an answer.
+
+Simple idea:
+- Retrieval finds useful information.
+- Generation converts that information into a final answer.
+
+How it works in this project:
+1. University documents are stored in data/rag_docs/.
+2. They are converted into chunks and embeddings.
+3. Those embeddings are stored in FAISS.
+4. When the user asks a question, similar chunks are retrieved.
+5. The LLM uses those chunks to answer.
+
+Why it is useful:
+- It allows the assistant to answer from project-specific university documents.
+- It improves factual grounding.
+
+Viva line:
+- "RAG helps the model answer based on our own university documents instead of relying only on general pretrained knowledge."
+
+
+4. Document Loading
+
+What it means:
+- Before using RAG, documents must be read from files and converted into machine-processable text.
+
+How it is used here:
+- The project loads:
+  - .txt files
+  - .pdf files
+- This is handled by utils/file_loader.py.
+
+Why it matters:
+- The system cannot retrieve information unless the source documents are first loaded properly.
+
+
+5. Chunking
+
+What it means:
+- Chunking means splitting a large document into smaller pieces.
+
+Why chunking is needed:
+- LLMs and vector search work better on smaller text units.
+- If an entire PDF is stored as one block, retrieval becomes inefficient and less accurate.
+
+How it is used here:
+- utils/text_splitter.py uses RecursiveCharacterTextSplitter.
+- It splits documents into chunks of:
+  - chunk_size = 500
+  - chunk_overlap = 50
+
+Meaning of overlap:
+- Overlap means some text is repeated between consecutive chunks.
+- This helps preserve context across chunk boundaries.
+
+Example:
+- If one chunk ends in the middle of an important explanation, overlap helps the next chunk still contain some of that meaning.
+
+Viva line:
+- "We use chunking to divide long documents into smaller searchable units, and overlap helps preserve context between adjacent chunks."
+
+
+6. Embeddings
+
+What it means:
+- Embeddings are numerical vector representations of text.
+- They capture semantic meaning.
+
+Simple intuition:
+- Similar sentences get similar vectors.
+
+How it is used here:
+- The project uses HuggingFace sentence-transformer embeddings.
+- The embedding model name is read from utils/config.py.
+
+Why embeddings matter:
+- Keyword matching only checks exact words.
+- Embeddings allow semantic search.
+- So a question like "hostel rules" can match a document that says "residential guidelines."
+
+Viva line:
+- "Embeddings convert text into vectors so that semantically similar text stays close in vector space."
+
+
+7. Vector
+
+What it means:
+- A vector is an ordered list of numbers.
+- In AI, text, images, or audio can be represented as vectors.
+
+How it is used here:
+- Every chunk of text becomes a vector.
+- User queries also become vectors.
+- Similarity search compares these vectors.
+
+
+8. Semantic Search
+
+What it means:
+- Semantic search finds relevant text based on meaning, not only exact words.
+
+Difference from keyword search:
+- Keyword search looks for exact terms.
+- Semantic search looks for concept similarity.
+
+Project use:
+- The retriever compares the query embedding with stored document embeddings.
+
+Why it helps:
+- Users may ask the same question in many ways.
+
+
+9. Vector Database / Vector Store
+
+What it means:
+- A vector database stores embeddings and supports similarity search.
+
+How it is used here:
+- FAISS is used for RAG document retrieval.
+- ChromaDB is used for long-term memory storage.
+
+Why two systems are used:
+- FAISS is used mainly for document retrieval.
+- ChromaDB is used for student-specific memory items like interests and doubts.
+
+Viva line:
+- "We use FAISS for document retrieval and ChromaDB for persistent vector memory."
+
+
+10. FAISS
+
+Full form:
+- Facebook AI Similarity Search
+
+What it means:
+- FAISS is a library for efficient similarity search on vectors.
+
+How it is used here:
+- Document chunk embeddings are stored in FAISS.
+- At runtime, the retriever loads the FAISS index and searches top-k relevant chunks.
+
+Why it is chosen:
+- Fast vector similarity search
+- Good for retrieval pipelines
+
+
+11. ChromaDB
+
+What it means:
+- ChromaDB is a vector database used for persistent semantic memory.
+
+How it is used here:
+- It stores student-specific long-term memories such as:
+  - doubts
+  - interests
+  - electives
+
+Why it is useful:
+- Later, the system can search previous student memories semantically.
+- This makes the assistant more personalized.
+
+
+12. Similarity Search
+
+What it means:
+- Similarity search finds items whose vectors are closest to a query vector.
+
+How it works:
+1. Convert query to embedding
+2. Compare with stored vectors
+3. Return nearest matches
+
+In simple words:
+- It answers: "Which stored text is most similar in meaning to this question?"
+
+
+13. Top-k Retrieval
+
+What it means:
+- Top-k means returning the best k matches.
+
+How it is used here:
+- The retriever often returns top 3 or top 5 documents.
+
+Why it matters:
+- Too few results may miss useful context.
+- Too many results may add noise.
+
+Viva line:
+- "Top-k retrieval balances relevance and context size."
+
+
+14. Prompt Engineering
+
+What it means:
+- Prompt engineering means designing instructions given to the LLM so it behaves as needed.
+
+How it is used here:
+- If documents are found:
+  - the prompt tells the model to answer only from documentation
+- If documents are not found:
+  - the prompt tells the model to answer carefully with a disclaimer
+- In memory extraction:
+  - prompts ask the LLM to return JSON
+  - prompts ask for summary, topics, and extracted student details
+
+Why it matters:
+- The model's output quality depends strongly on the prompt.
+
+
+15. Context
+
+What it means:
+- Context is the information given to the model along with the user query.
+
+Types of context in this project:
+- current user question
+- student memory
+- retrieved documents
+- conversation history
+
+Why context matters:
+- Better context gives more accurate and relevant responses.
+
+
+16. Guardrails
+
+What it means:
+- Guardrails are safety rules that prevent harmful or disallowed outputs.
+
+How it is used here:
+- backend/guardrails.py checks the user's message before processing.
+- It blocks content related to:
+  - violence
+  - illegal activity
+  - academic dishonesty
+  - harassment
+  - privacy violation
+  - suspicious behavior
+
+Why it is useful:
+- It keeps the assistant aligned with responsible AI behavior.
+
+Viva line:
+- "Guardrails act as the first safety layer before any retrieval or generation happens."
+
+
+17. Caching
+
+What it means:
+- Caching means storing results temporarily so repeated work can be avoided.
+
+How it is used here:
+- backend/services/cache.py stores recent responses.
+- The LLM object is cached.
+- The FAISS vector store is cached.
+- The embedding model is cached.
+
+Why it helps:
+- Faster responses
+- Less repeated computation
+- Lower resource usage
+
+Viva line:
+- "Caching improves performance by reusing previously computed responses and loaded resources."
+
+
+18. Memory in AI systems
+
+What it means:
+- Memory lets the assistant remember useful information beyond the current message.
+
+Why it matters:
+- Without memory, every conversation starts from zero.
+- With memory, the assistant can personalize responses.
+
+This project uses three memory types:
+- entity memory
+- summary memory
+- vector memory
+
+
+19. Entity Memory
+
+What it means:
+- Structured memory about a student profile.
+
+Examples:
+- student name
+- program
+- year
+- department
+- ongoing issues
+- interested courses
+
+How it is stored:
+- JSON file: data/memory/student_memory.json
+
+Why it matters:
+- It helps the assistant answer with personalization.
+
+
+20. Summary Memory
+
+What it means:
+- A short summary of a conversation.
+
+Why it is useful:
+- Long full chat histories become too large.
+- A summary keeps important information in a compact form.
+
+How it is stored:
+- Also saved in the JSON memory file.
+
+
+21. Vector Memory
+
+What it means:
+- Long-term memory stored as embeddings for semantic search.
+
+Examples:
+- student doubts
+- interests
+- elective preferences
+
+How it is stored:
+- ChromaDB
+
+Why it matters:
+- The system can find relevant past student information even if the wording changes.
+
+
+22. LangGraph
+
+What it means:
+- LangGraph is a framework for building step-by-step AI workflows as graphs.
+
+How it is used here:
+- memory_graph.py creates a workflow for memory extraction.
+- The nodes are:
+  1. extract entities
+  2. identify topics
+  3. summarize conversation
+  4. extract vector memories
+  5. persist memory
+
+Why it is useful:
+- It organizes a multi-step AI workflow clearly.
+- It is better than writing one large monolithic function.
+
+Viva line:
+- "LangGraph is used to structure the memory extraction pipeline into separate sequential nodes."
+
+
+23. Workflow / Pipeline
+
+What it means:
+- A pipeline is a sequence of stages where output of one stage becomes input of the next.
+
+Example in this project:
+- chat pipeline:
+  guardrails -> cache -> memory -> retrieval -> LLM -> memory save
+
+Why this concept matters:
+- It makes the system modular.
+- Each stage has a specific responsibility.
+
+
+24. API
+
+Full form:
+- Application Programming Interface
+
+What it means:
+- An API allows different parts of software to communicate.
+
+How it is used here:
+- The frontend calls backend endpoints through HTTP requests.
+
+Examples:
+- /chat/
+- /course/
+- /fees/
+- /calendar/
+
+
+25. FastAPI
+
+What it means:
+- FastAPI is a Python framework for building APIs quickly.
+
+Why it is used here:
+- It is simple, modern, and good for Python-based backends.
+- It supports type hints and automatic validation.
+
+Project role:
+- It powers the backend server.
+
+
+26. Route / Endpoint
+
+What it means:
+- A route or endpoint is a URL path that performs a specific backend task.
+
+Examples:
+- POST /chat/
+- GET /course/
+- GET /faculty/
+
+Why it matters:
+- Each feature is exposed as a backend endpoint.
+
+
+27. Pydantic Models
+
+What it means:
+- Pydantic models define the expected structure of request and response data.
+
+How it is used here:
+- ChatRequest
+- ChatResponse
+- ContextSettings
+
+Why it helps:
+- Validation
+- cleaner API design
+- fewer bugs from wrong input formats
+
+
+28. Streamlit
+
+What it means:
+- Streamlit is a Python framework for building quick web interfaces.
+
+How it is used here:
+- It creates the frontend UI.
+- The chat screen and lookup screens are built with Streamlit components.
+
+Why it is useful:
+- Fast development
+- easy integration with Python backend logic
+
+
+29. Frontend and Backend
+
+Frontend:
+- what the user sees and interacts with
+
+Backend:
+- where the logic runs
+
+In this project:
+- Streamlit is the frontend
+- FastAPI is the backend
+
+Communication:
+- The frontend sends HTTP requests to the backend
+- The backend returns JSON responses
+
+
+30. JSON
+
+What it means:
+- JSON is a text format for storing and exchanging structured data.
+
+How it is used here:
+- API requests and responses
+- student memory storage
+- fee data
+- campus map data
+- test query data
+
+
+31. CSV
+
+What it means:
+- CSV stands for Comma-Separated Values.
+- It is a simple table file format.
+
+How it is used here:
+- course catalog
+- faculty list
+- academic calendar
+- timetable
+
+Why it is used:
+- easy to store tabular data
+- easy to load using pandas
+
+
+32. Pandas
+
+What it means:
+- Pandas is a Python library for working with tabular data.
+
+How it is used here:
+- Tool files read CSV files using pandas.
+- Example: searching a course by course code.
+
+Why it matters:
+- It makes filtering and querying structured data easy.
+
+
+33. Environment Variables
+
+What it means:
+- Environment variables are external configuration values.
+
+How it is used here:
+- .env stores:
+  - GOOGLE_API_KEY
+  - GEMINI_MODEL
+  - EMBEDDING_MODEL
+  - LLM_TEMPERATURE
+
+Why it matters:
+- Sensitive data like API keys should not be hardcoded in the source code.
+
+
+34. CORS
+
+Full form:
+- Cross-Origin Resource Sharing
+
+What it means:
+- A browser security mechanism that controls whether one app can call another app on a different origin.
+
+How it is used here:
+- backend/main.py enables CORS.
+
+Why it matters:
+- It allows the frontend to communicate with the backend.
+
+
+35. Singleton Pattern
+
+What it means:
+- A singleton is an object created once and reused.
+
+How it is used here:
+- get_llm() returns one cached LLM service
+- get_memory_manager() returns one shared memory manager
+- get_conversation_cache() returns one shared cache
+
+Why it helps:
+- Avoids repeated heavy initialization
+- Improves speed and consistency
+
+
+36. Dataclass
+
+What it means:
+- A dataclass is a Python feature used to define structured data objects more easily.
+
+How it is used here:
+- StudentEntityMemory
+- SummaryMemory
+
+Why it helps:
+- Cleaner code
+- easier conversion to dictionaries
+
+
+37. TypedDict
+
+What it means:
+- A TypedDict describes the expected keys and value types in a dictionary.
+
+How it is used here:
+- ConversationState in memory_graph.py
+
+Why it helps:
+- Makes the workflow state structure clearer.
+
+
+38. Conversation ID and User ID
+
+What they mean:
+- user_id identifies the student
+- conversation_id identifies a specific chat session
+
+Why they are useful:
+- user_id supports persistent personalization
+- conversation_id separates multiple conversations
+
+
+39. Personalization
+
+What it means:
+- Personalization means giving answers based on the student's own context.
+
+How it is achieved here:
+- entity memory
+- vector memory
+- previous conversation information
+
+Example:
+- The assistant can answer differently for a first-year MBA student and a final-year BTech student.
+
+
+40. Hallucination
+
+What it means:
+- Hallucination is when an AI model gives information that is fluent but not actually correct or supported.
+
+How the project tries to reduce it:
+- RAG
+- official-document-only prompts when docs exist
+- disclaimer when docs do not exist
+- structured data tools for factual queries
+
+
+41. Explainability
+
+What it means:
+- Explainability means being able to understand where an answer came from.
+
+How it is supported here:
+- chat UI shows source badges such as:
+  - cache
+  - docs
+  - model
+  - blocked
+
+Why it matters:
+- Users can tell whether the answer came from documents or from general AI generation.
+
+
+42. Structured Data Lookup
+
+What it means:
+- Instead of asking the LLM for everything, some information is fetched directly from structured datasets.
+
+How it is used here:
+- courses from CSV
+- fees from JSON
+- timetable from CSV
+- calendar from CSV
+- faculty from CSV
+
+Why it is useful:
+- More deterministic
+- More accurate for fixed factual information
+- Faster than full LLM generation
+
+
+43. Hybrid System
+
+What it means:
+- A hybrid system combines more than one technique.
+
+This project is hybrid because it combines:
+- structured lookup
+- RAG
+- LLM generation
+- memory
+- guardrails
+
+Viva line:
+- "This is a hybrid AI system because it uses both symbolic/structured retrieval and generative AI."
+
+
+44. Response Source Classification
+
+What it means:
+- The system labels where the answer came from.
+
+Current sources:
+- cache
+- memory context + generation
+- rag
+- model
+- guardrail
+
+Why it matters:
+- Better transparency
+- easier debugging
+
+
+45. Evaluation
+
+What it means:
+- Evaluation measures how good the system is.
+
+Why it matters:
+- A project is not complete with only implementation.
+- We also need to check quality and performance.
+
+Current evaluation areas in the project:
+- retrieval quality
+- response quality
+- advising quality
+- latency
+
+
+46. Precision, Recall, Hit Rate
+
+Precision:
+- Of the retrieved items, how many were relevant?
+
+Recall:
+- Of the relevant items, how many were retrieved?
+
+Hit Rate:
+- Whether at least one relevant result was found
+
+How it relates here:
+- Used in RAG evaluation.
+
+
+47. ROUGE-L
+
+What it means:
+- A text similarity metric based on longest common subsequence.
+
+Why it is useful:
+- It measures overlap between a generated answer and a reference answer.
+
+How it is used here:
+- response_quality.py uses a simplified ROUGE-L style score.
+
+
+48. BERTScore-like Similarity
+
+What it means:
+- A semantic similarity style metric for text comparison.
+
+How it is used here:
+- The project includes a simplified overlap-based version in evaluation.
+
+Why it matters:
+- It helps estimate how similar the answer is to an expected response.
+
+
+49. Latency
+
+What it means:
+- Latency is the time taken to produce a response.
+
+Why it matters:
+- Even a correct system is frustrating if it is too slow.
+
+Project note:
+- evaluation/latency_tests.py is meant to test speed.
+
+
+50. Academic Integrity
+
+What it means:
+- Students must do their own work honestly.
+
+Why it appears in this project:
+- The guardrails explicitly block cheating-related requests.
+
+Why it is important in viva:
+- It shows responsible AI design for an education setting.
+
+
+51. Responsible AI
+
+What it means:
+- Building AI systems that are safe, fair, transparent, and useful.
+
+How it is shown here:
+- guardrails
+- source labeling
+- document grounding
+- disclaimer when not based on official docs
+
+
+52. Modular Architecture
+
+What it means:
+- The system is split into smaller parts, each with a specific job.
+
+How it is shown here:
+- routes handle endpoints
+- services handle logic
+- tools handle structured data
+- utils handle shared helper functions
+- frontend handles UI
+
+Why it matters:
+- easier maintenance
+- easier debugging
+- easier extension
+
+
+53. Separation of Concerns
+
+What it means:
+- Different parts of the code should focus on different responsibilities.
+
+Example in this project:
+- chat.py controls chat flow
+- llm.py controls model access
+- retriever.py controls document retrieval
+- memory.py controls memory storage
+- frontend files handle user interface
+
+
+54. Persistence
+
+What it means:
+- Persistence means data survives after the app stops.
+
+How it is used here:
+- student memory JSON is persistent
+- ChromaDB is persistent
+- FAISS index is saved on disk
+
+Why it matters:
+- The system does not lose everything after restart.
+
+
+55. Indexing
+
+What it means:
+- Indexing means preparing data in a structure that supports efficient search.
+
+How it is used here:
+- create_index.py builds the FAISS index from RAG documents.
+
+Why it matters:
+- Retrieval would be much slower or impossible without indexing.
+
+
+56. Inference
+
+What it means:
+- Inference is the process of using the trained model to generate an output from new input.
+
+How it is used here:
+- When the user asks a question, Gemini performs inference to generate a response.
+
+
+57. Temperature
+
+What it means:
+- Temperature controls randomness in LLM output.
+
+Low temperature:
+- more focused, more deterministic
+
+High temperature:
+- more creative, more varied
+
+How it is used here:
+- The temperature is configured in .env and utils/config.py
+
+
+58. CPU Inference for Embeddings
+
+What it means:
+- The embedding model can run on CPU instead of GPU.
+
+How it is used here:
+- utils/embeddings.py sets device to CPU.
+
+Why:
+- easier to run on normal systems
+- simpler deployment
+
+
+59. Metadata
+
+What it means:
+- Metadata is extra descriptive information stored along with main data.
+
+How it is used here:
+- Vector memories store metadata like:
+  - student_id
+  - type
+  - timestamp
+  - topic
+
+Why it helps:
+- Better filtering and better understanding of stored memory
+
+
+60. Why this project is strong for viva
+
+Technical strengths:
+- combines multiple AI concepts in one project
+- uses both structured and semantic retrieval
+- includes personalization through memory
+- includes safety through guardrails
+- includes evaluation scripts
+- uses modular design
+
+Good one-line summary:
+- "Our system is a hybrid university assistant that combines FastAPI, Streamlit, structured data tools, RAG with FAISS, long-term student memory with ChromaDB, and Gemini-based response generation."
+
+
+61. Likely viva questions with short answers
+
+Q. Why did you use RAG?
+- To ground the LLM in university-specific documents and reduce hallucination.
+
+Q. Why do you need chunking?
+- Large documents are hard to search directly, so we split them into smaller meaningful units for better retrieval.
+
+Q. What are embeddings?
+- Numerical vector representations of text that capture semantic meaning.
+
+Q. Why use FAISS?
+- It provides efficient similarity search for document embeddings.
+
+Q. Why use ChromaDB also?
+- FAISS handles document retrieval, while ChromaDB stores persistent student memory for personalization.
+
+Q. What is the role of LangGraph?
+- It structures the memory extraction workflow into multiple clear steps.
+
+Q. How do you reduce hallucination?
+- By retrieving official documents, prompting the model to answer only from them, and using disclaimers when no docs are found.
+
+Q. Why use structured tools instead of only LLM?
+- Structured data lookups are faster and more accurate for factual tabular information.
+
+Q. What is the role of guardrails?
+- They block unsafe or policy-violating prompts before generation.
+
+Q. What is the role of memory?
+- It helps the assistant personalize responses and remember important student information across conversations.
+
+Q. What is the difference between entity memory and vector memory?
+- Entity memory stores fixed structured profile data, while vector memory stores semantic long-term information for similarity search.
+
+Q. Why use FastAPI and Streamlit?
+- FastAPI provides a clean backend API, and Streamlit gives a simple Python-based frontend.
+
+
+62. Final viva revision paragraph
+
+This project is a hybrid AI university assistant. It uses FastAPI as the backend and Streamlit as the frontend. For direct factual queries, it uses structured CSV and JSON data. For document-based answering, it uses RAG, where documents are loaded, chunked, embedded, indexed in FAISS, and retrieved during question answering. The final response is generated by Gemini. To make the system personalized, it stores entity memory, summary memory, and vector memory, with ChromaDB used for long-term semantic memory. To keep the system safe, guardrails filter harmful or dishonest prompts. Caching improves speed, and evaluation scripts help measure retrieval quality, response quality, and latency.
+

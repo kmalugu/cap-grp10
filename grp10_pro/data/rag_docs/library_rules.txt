@@ -1,0 +1,25 @@
+LIBRARY RULES
+
+1. Timings:
+- 9:00 AM to 9:00 PM (Weekdays)
+- 10:00 AM to 5:00 PM (Weekends)
+
+2. Borrowing:
+- Max 3 books per student
+- Duration: 14 days
+
+3. Fines:
+- ₹5 per day after due date
+
+4. Conduct:
+- Silence must be maintained
+- No eating inside library
+
+5. Digital Library:
+- Students can access e-books and journals
+
+6. ID Requirement:
+- Library card mandatory for entry
+
+7. Lost Books:
+- Must be replaced or paid for

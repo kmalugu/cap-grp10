@@ -1,0 +1,159 @@
+{
+    "student_001": {
+        "name": "Prasanjit Biswal",
+        "program": "BTech",
+        "year": "2",
+        "department": "CSE",
+        "interests": [
+            "Machine Learning",
+            "Data Science"
+        ],
+        "ongoing_issues": [],
+        "previous_queries": [
+            "What are prerequisites for ML301?",
+            "Show my timetable",
+            "what is the time limit to get entry to the hostel",
+            "what is the time limit to get entry to the hostel",
+            "what is the time limit to get entry to the hostel",
+            "what is the time limit to get entry to the hostel"
+        ],
+        "entity": {
+            "student_id": "student_001",
+            "name": "James",
+            "program": null,
+            "year": null,
+            "department": null,
+            "ongoing_issues": [],
+            "courses_interested": [],
+            "created_at": "2026-03-25T13:51:21.945882",
+            "updated_at": "2026-03-25T13:54:44.223403"
+        },
+        "summaries": {
+            "conv_1774426604": {
+                "student_id": "student_001",
+                "conversation_id": "conv_1774426604",
+                "summary": "Here is a 2-3 sentence summary of the student advising conversation:\n\nThe student, James, asked his name and received confirmation that it was indeed \"James\" from the advisor. The advisor also assured James that they were happy to help him with any questions or concerns he may have had.",
+                "key_topics": [
+                    "Name",
+                    "I",
+                    "n",
+                    "t",
+                    "r",
+                    "o",
+                    "d",
+                    "u",
+                    "c",
+                    "t",
+                    "i",
+                    "o",
+                    "n",
+                    "G",
+                    "e",
+                    "n",
+                    "e",
+                    "r",
+                    "a",
+                    "l",
+                    " ",
+                    "I",
+                    "n",
+                    "q",
+                    "u",
+                    "i",
+                    "r",
+                    "y"
+                ],
+                "timestamp": "2026-03-25T13:54:44.231407",
+                "conversation_length": 6,
+                "last_updated": "2026-03-25T13:54:44.231407"
+            },
+            "conv_1774450187": {
+                "student_id": "student_001",
+                "conversation_id": "conv_1774450187",
+                "summary": "The student asked about the hostel entry time. The key advice given was that entry is allowed until 10:00 PM.",
+                "key_topics": [
+                    "Hostel entry time"
+                ],
+                "timestamp": "2026-03-25T20:21:05.821999",
+                "conversation_length": 4,
+                "last_updated": "2026-03-25T20:21:05.821999"
+            }
+        }
+    },
+    "student_002": {
+        "name": "Ananya Verma",
+        "program": "MBA",
+        "year": "1",
+        "department": "Management",
+        "interests": [
+            "Finance",
+            "Marketing"
+        ],
+        "ongoing_issues": [
+            "Scholarship eligibility"
+        ],
+        "previous_queries": [
+            "What is MBA fee structure?",
+            "When is exam schedule?"
+        ],
+        "summaries": {
+            "conv_1774419940": {
+                "student_id": "student_002",
+                "conversation_id": "conv_1774419940",
+                "summary": "Here is a 2-3 sentence summary of the conversation:\n\nStudent Shag asked the assistant to reveal their name, but since there was no prior information available, the assistant could not provide an answer. The assistant explained that as a new student with no previous information, there was no name listed in the documentation.",
+                "key_topics": [
+                    "General"
+                ],
+                "timestamp": "2026-03-25T12:10:38.805525",
+                "conversation_length": 6,
+                "last_updated": "2026-03-25T12:10:38.805525"
+            }
+        },
+        "entity": {
+            "student_id": "student_002",
+            "name": "Shag",
+            "program": null,
+            "year": null,
+            "department": null,
+            "ongoing_issues": [],
+            "courses_interested": [],
+            "created_at": "2026-03-25T12:10:38.803523",
+            "updated_at": "2026-03-25T12:10:38.803523"
+        }
+    },
+    "404": {
+        "previous_queries": [
+            "time limit to get entry into the hostel"
+        ]
+    },
+    "student_003": {
+        "previous_queries": [
+            "what is the time limit to get entry to the hostel",
+            "what is the time limit to get entry to the hostel at night"
+        ],
+        "entity": {
+            "student_id": "student_003",
+            "name": "PB",
+            "program": null,
+            "year": null,
+            "department": null,
+            "ongoing_issues": [],
+            "courses_interested": [],
+            "created_at": "2026-03-25T13:18:53.651273",
+            "updated_at": "2026-03-25T13:18:53.651273"
+        },
+        "summaries": {
+            "conv_1774424659": {
+                "student_id": "student_003",
+                "conversation_id": "conv_1774424659",
+                "summary": "Here is a summary of the conversation:\n\nPB, a new student, asked what their name was, but since there was no prior information or documentation provided, the assistant couldn't provide an answer. Instead, they encouraged PB to start fresh and focus on asking questions about university life.",
+                "key_topics": [
+                    "General"
+                ],
+                "timestamp": "2026-03-25T13:18:53.656274",
+                "conversation_length": 4,
+                "last_updated": "2026-03-25T13:18:53.656274"
+            }
+        }
+    }
+}

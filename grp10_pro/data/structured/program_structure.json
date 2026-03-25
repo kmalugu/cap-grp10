@@ -1,0 +1,17 @@
+{
+  "BTech": {
+    "year1": ["Math101", "Physics101", "AI101"],
+    "year2": ["DS201", "DBMS202"],
+    "year3": ["ML301", "Operating Systems"],
+    "year4": ["Project", "Electives"]
+  },
+  "MBA": {
+    "year1": ["MBA101", "Finance Basics"],
+    "year2": ["Marketing", "Strategy"]
+  },
+  "PhD": {
+    "year1": ["Research Methodology"],
+    "year2": ["Literature Review"],
+    "year3": ["Thesis"]
+  }
+}

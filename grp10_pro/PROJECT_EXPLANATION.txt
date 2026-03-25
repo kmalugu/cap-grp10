@@ -1,0 +1,607 @@
+PROJECT EXPLANATION
+University AI Assistant
+
+1. What this project is
+
+This project is a university assistant application with:
+- a FastAPI backend
+- a Streamlit frontend
+- structured data lookup tools
+- a RAG pipeline for answering from university documents
+- a memory system for remembering student information across conversations
+- a simple guardrails layer to block unsafe requests
+
+At a high level, the app tries to answer student questions in this order:
+1. Check guardrails
+2. Check cached response
+3. Load student memory
+4. Search university documents with RAG
+5. Ask the LLM to answer
+6. Save new memory from the conversation
+
+
+2. Main folders
+
+backend/
+- API server code
+- routes define endpoints
+- services contain business logic
+- tools provide structured-data lookups
+
+frontend/
+- Streamlit user interface
+- components for chat, course, timetable, fees, and calendar screens
+
+data/
+- raw and structured project data
+- RAG source documents
+- student memory JSON
+
+models/
+- generated vector stores
+- FAISS index for RAG
+- ChromaDB storage for long-term memory
+
+utils/
+- shared helpers for config, document loading, text splitting, and embeddings
+
+evaluation/
+- optional scripts to test retrieval, response quality, and latency
+
+docs/
+- project reference documents moved out of the root for cleanliness
+
+examples/
+- demo scripts for trying features manually
+
+
+3. How the project starts
+
+Backend startup path:
+1. You run the backend, usually with:
+   python -m uvicorn backend.main:app --reload
+2. backend/main.py creates the FastAPI app.
+3. It adds CORS so the frontend can call the backend.
+4. It registers all route modules:
+   - chat
+   - course
+   - timetable
+   - fees
+   - calendar
+   - rag
+   - faculty
+
+Frontend startup path:
+1. You run the frontend, usually with:
+   streamlit run frontend/app.py
+2. frontend/app.py shows a sidebar feature picker.
+3. Depending on the selected option, it loads one UI component:
+   - chat_ui
+   - course_ui
+   - timetable_ui
+   - fees_ui
+   - calendar_ui
+
+
+4. End-to-end chat flow
+
+The most important file in the project is:
+backend/routes/chat.py
+
+This file controls the main assistant behavior.
+
+Step 1: Receive request
+- POST /chat/
+- Input is defined by ChatRequest:
+  - user_id
+  - conversation_id
+  - message
+  - end_conversation
+
+Step 2: Guardrails check
+- backend/guardrails.py checks the user message first.
+- It blocks harmful, illegal, dishonest, privacy-violating, or abusive prompts.
+- If blocked, the route returns immediately with source="guardrail".
+
+Step 3: Initialize shared services
+- get_llm() from backend/services/llm.py
+- get_memory_manager() from backend/services/memory.py
+- get_conversation_cache() from backend/services/cache.py
+
+Step 4: Load user settings
+- chat.py stores per-user context settings in memory.
+- Current settings include:
+  - context_length
+  - rag_enabled
+  - memory_enabled
+  - use_cache
+- Important note:
+  - rag_enabled and use_cache are used in runtime behavior
+  - memory_enabled and context_length are stored and exposed in the UI, but are not currently enforced in the chat logic
+
+Step 5: Cache lookup
+- backend/services/cache.py stores recent responses by a hash of:
+  - user_id
+  - normalized query text
+- If a cached response exists and is not expired, the route returns it quickly.
+
+Step 6: Student memory lookup
+- backend/services/memory.py loads:
+  - entity memory from data/memory/student_memory.json
+  - vector memory from ChromaDB in models/chroma_db
+- chat.py builds a "student context" string from:
+  - name
+  - program
+  - year
+  - department
+  - issues
+  - interested courses
+  - relevant past vector memories
+
+Step 7: RAG retrieval
+- backend/services/retriever.py loads the FAISS index from models/faiss_index/
+- It uses embeddings from utils/embeddings.py
+- It retrieves top matching chunks from the indexed documents
+- If documents are found:
+  - chat.py adds them to the prompt
+  - source becomes "rag"
+  - is_from_docs becomes True
+
+Step 8: LLM response generation
+- If RAG found relevant docs:
+  - the prompt tells the LLM to answer only from documentation
+- If RAG found nothing:
+  - the prompt tells the LLM to answer as general knowledge
+  - it should start with a disclaimer
+
+Step 9: Save conversation turn
+- The user message and assistant reply are appended to conversation_cache in chat.py
+- A cached response is also stored through backend/services/cache.py
+
+Step 10: Memory extraction
+- If the conversation ends, or if enough messages accumulate, chat.py calls:
+  process_conversation_for_memory(...)
+- That function lives in backend/services/memory_graph.py
+
+Step 11: Memory graph processing
+- memory_graph.py uses LangGraph to run a multi-step workflow:
+  1. extract entity information
+  2. identify topics
+  3. generate a summary
+  4. extract doubts, interests, and electives
+  5. persist all memories
+
+Step 12: Store memories
+- backend/services/memory.py stores:
+  - entity memory in JSON
+  - summary memory in JSON
+  - vector memory in ChromaDB
+
+
+5. Backend files and what each one does
+
+backend/main.py
+- creates the FastAPI app
+- registers all routes
+- enables CORS
+
+backend/guardrails.py
+- blocks unsafe content before the assistant answers
+- contains default keyword categories like violence, illegal acts, academic dishonesty, harassment, privacy abuse, suspicious behavior, and misinformation
+- returns a safe refusal message if a violation is found
+- note: the current code defines keywords in Python directly
+- note: data/guardrails_keywords.json exists in the project, but this file is not currently loaded by guardrails.py
+
+backend/routes/chat.py
+- main intelligent chat endpoint
+- handles guardrails, cache, memory, RAG, LLM, and memory persistence
+- also contains debug endpoints and settings endpoints
+
+backend/routes/course.py
+- GET /course/
+- returns course details using course_tool.py
+
+backend/routes/timetable.py
+- GET /timetable/
+- returns timetable entries using timetable_tool.py
+
+backend/routes/fees.py
+- GET /fees/
+- returns fee data using fees_tool.py
+
+backend/routes/calendar.py
+- GET /calendar/
+- returns academic calendar entries using calendar_tool.py
+
+backend/routes/faculty.py
+- GET /faculty/
+- returns faculty data using faculty_tool.py
+
+backend/routes/rag.py
+- POST /rag/
+- simple standalone RAG endpoint
+- uses backend/services/rag_pipeline.py
+- note: the main chat route does not call rag_pipeline.py directly
+- note: chat.py instead performs retrieval and prompting itself
+
+backend/services/llm.py
+- wraps ChatGoogleGenerativeAI
+- loads Gemini settings from utils/config.py
+- exposes get_llm() as a cached singleton
+- normalizes model responses into plain text
+
+backend/services/retriever.py
+- loads the FAISS vector store from disk
+- performs similarity search over indexed document chunks
+
+backend/services/rag_pipeline.py
+- simple reusable RAG pipeline
+- retrieve docs
+- build prompt
+- call LLM
+- return answer
+- this is mainly used by backend/routes/rag.py
+
+backend/services/cache.py
+- in-memory cache for:
+  - conversation history
+  - query-response pairs
+- supports TTL expiration and simple stats
+
+backend/services/memory.py
+- central memory manager
+- supports three memory types:
+  - entity memory
+  - summary memory
+  - vector memory
+
+backend/services/memory_graph.py
+- LangGraph workflow that extracts structured memory from conversations
+- calls the LLM multiple times for extraction and summarization
+
+backend/tools/course_tool.py
+- loads course_catalog.csv with pandas
+- returns course details by course code
+
+backend/tools/timetable_tool.py
+- loads timetable.csv with pandas
+- filters by year and department
+
+backend/tools/fees_tool.py
+- loads fees_scholarships.json
+- returns fee data by program and nationality
+
+backend/tools/calendar_tool.py
+- loads academic_calendar.csv with pandas
+- returns events by program
+
+backend/tools/faculty_tool.py
+- loads faculty.csv with pandas
+- returns faculty rows by department
+
+backend/tools/map_tool.py
+- loads campus_map.json
+- can return campus location details and a Google Maps link
+- important note:
+  - this tool currently has no FastAPI route attached to it
+  - it exists in the codebase but is not exposed in the current API or frontend
+
+
+6. Frontend files and what each one does
+
+frontend/app.py
+- main Streamlit entry point
+- displays title and sidebar feature menu
+- loads one UI component at a time
+
+frontend/components/chat_ui.py
+- most advanced UI component
+- calls /chat/ for assistant responses
+- supports:
+  - user ID switching
+  - new conversation creation
+  - clearing conversation history
+  - toggling RAG, memory, cache settings
+  - showing cache stats
+  - showing source badges like cache, docs, AI, or blocked
+
+frontend/components/course_ui.py
+- simple UI for course lookup
+- calls /course/
+
+frontend/components/timetable_ui.py
+- simple UI for timetable lookup
+- calls /timetable/
+
+frontend/components/fees_ui.py
+- simple UI for fee lookup
+- calls /fees/
+
+frontend/components/calendar_ui.py
+- simple UI for academic calendar lookup
+- calls /calendar/
+
+
+7. Utility files
+
+utils/config.py
+- loads environment variables from .env
+- defines:
+  - GEMINI_MODEL
+  - GOOGLE_API_KEY
+  - EMBEDDING_MODEL
+  - LLM_TEMPERATURE
+  - RAG_DOCS_PATH
+  - FAISS_PATH
+  - CHROMA_PATH
+  - VECTOR_MEMORY_COLLECTION
+
+utils/file_loader.py
+- reads .txt and .pdf files from data/rag_docs/
+- uses TextLoader and PyPDFLoader
+
+utils/text_splitter.py
+- splits long documents into chunks
+- uses chunk_size=500 and chunk_overlap=50
+
+utils/embeddings.py
+- creates the HuggingFace embedding model
+- caches it with lru_cache so it is not reloaded repeatedly
+
+
+8. Data and model folders
+
+data/rag_docs/
+- source documents for RAG
+- these are the files that get indexed by create_index.py
+- examples:
+  - student_handbook.pdf
+  - library_rules.txt
+  - hostel_guidelines.txt
+  - placement_guidelines.txt
+
+data/structured/
+- structured datasets for non-RAG endpoints
+- examples:
+  - course_catalog.csv
+  - timetable.csv
+  - faculty.csv
+  - academic_calendar.csv
+  - fees_scholarships.json
+  - campus_map.json
+
+data/memory/student_memory.json
+- stores persistent entity memory and conversation summaries
+- human-readable JSON file
+
+models/faiss_index/
+- vector store used by RAG retrieval
+- generated by create_index.py
+
+models/chroma_db/
+- persistent vector memory database for long-term student memories
+
+
+9. How RAG works in this project
+
+RAG means Retrieval-Augmented Generation.
+
+In this project it works like this:
+1. Source documents live in data/rag_docs/
+2. create_index.py loads those documents
+3. utils/text_splitter.py breaks them into chunks
+4. utils/embeddings.py creates embeddings for each chunk
+5. The chunks are stored in FAISS at models/faiss_index/
+6. When the user asks a question:
+   - retriever.py finds similar chunks
+   - chat.py or rag_pipeline.py builds a prompt using those chunks
+   - llm.py sends the prompt to Gemini
+7. The final answer is returned to the user
+
+Why this matters:
+- answers can come from the project's university documents
+- this reduces hallucination compared to plain LLM answers
+
+
+10. How memory works in this project
+
+The memory system has three layers.
+
+Entity memory
+- stored in JSON
+- remembers stable student profile information
+- examples:
+  - name
+  - program
+  - year
+  - department
+  - ongoing issues
+  - interested courses
+
+Summary memory
+- also stored in JSON
+- saves short summaries of completed conversations
+- helps keep longer histories manageable
+
+Vector memory
+- stored in ChromaDB
+- saves semantic memory items like:
+  - doubts
+  - interests
+  - electives
+- allows similarity search over previous student-specific information
+
+Why memory_graph.py exists:
+- instead of saving raw chat blindly, it extracts structured information
+- it uses the LLM to convert conversation text into useful memory objects
+
+
+11. How caching works
+
+There are two different cache-like ideas in the project:
+
+Application response cache
+- backend/services/cache.py
+- stores question-response pairs temporarily in memory
+- improves speed for repeated questions
+
+Internal model/vector caching
+- llm.py caches the LLM service object
+- retriever.py caches the loaded FAISS vector store
+- embeddings.py caches the embedding model object
+
+
+12. Structured lookup flow
+
+Not all questions use RAG.
+
+Some features use direct data lookup:
+- course lookup reads course_catalog.csv
+- timetable lookup reads timetable.csv
+- fees lookup reads fees_scholarships.json
+- calendar lookup reads academic_calendar.csv
+- faculty lookup reads faculty.csv
+
+These are simpler than the chat route because they do not need:
+- document retrieval
+- prompt engineering
+- memory extraction
+
+
+13. Evaluation files
+
+evaluation/rag_evaluation.py
+- basic retrieval quality checks
+- reports simple Precision@k, Recall@k, and Hit Rate style metrics
+
+evaluation/response_quality.py
+- computes simplified ROUGE-L and BERTScore-like overlap metrics
+
+evaluation/advising_quality_simple.py
+- scores sample responses on:
+  - relevance
+  - correctness
+  - personalization
+  - non-hallucination
+  - policy adherence
+
+evaluation/latency_tests.py
+- intended to measure response times
+- important note:
+  - some endpoints in this file do not match the current FastAPI routes
+  - for example it calls path-style URLs like /course/{code} and /timetable/{student_id}
+  - the current backend uses query parameters like /course/?code=... and /timetable/?year=...&department=...
+  - it also calls /rag/search, but the current route is POST /rag/
+- so this file appears older than the current API and may need updating before use
+
+evaluation/test_queries.json
+- small sample query-answer set for testing
+
+
+14. Example and docs files
+
+examples/examples_memory_usage.py
+- demonstrates how to interact with the memory endpoints
+- useful for learning and manual testing
+- not required for normal app startup
+
+docs/
+- contains reference material and supporting project documents
+- useful for understanding the project background
+- not required for the app to run
+
+
+15. Important configuration
+
+.env
+- stores local environment variables
+- most important one is GOOGLE_API_KEY
+- optional settings include:
+  - GEMINI_MODEL
+  - EMBEDDING_MODEL
+  - LLM_TEMPERATURE
+
+requirements.txt
+- dependency list for the project
+- includes FastAPI, Streamlit, LangChain, FAISS, ChromaDB, sentence-transformers, and LangGraph
+
+
+16. Step-by-step "what happens when a user sends a chat message"
+
+1. User types in frontend/components/chat_ui.py
+2. Streamlit sends POST request to /chat/
+3. backend/routes/chat.py receives the message
+4. guardrails.py checks safety
+5. cache.py checks if the same user already asked the same thing recently
+6. memory.py loads student profile and similar past memories
+7. retriever.py searches the FAISS document index
+8. llm.py sends the constructed prompt to Gemini
+9. chat.py returns the answer to the frontend
+10. chat_ui.py displays the answer and shows its source badge
+11. if the conversation is ending or long enough, memory_graph.py extracts useful memory
+12. memory.py writes the extracted memory to JSON and ChromaDB
+
+
+17. Best reading order if you want to understand the code quickly
+
+Read in this order:
+1. backend/main.py
+2. backend/routes/chat.py
+3. backend/services/llm.py
+4. backend/services/retriever.py
+5. backend/services/memory.py
+6. backend/services/memory_graph.py
+7. frontend/app.py
+8. frontend/components/chat_ui.py
+9. backend/routes/course.py, timetable.py, fees.py, calendar.py, faculty.py
+10. backend/tools/
+11. utils/
+12. evaluation/
+
+
+18. Current design notes and caveats
+
+These are useful to know so you do not get confused while reading:
+
+- backend/routes/rag.py uses rag_pipeline.py, but the main chat flow does not.
+- backend/tools/map_tool.py exists, but no route or frontend screen currently uses it.
+- data/guardrails_keywords.json exists, but guardrails.py does not currently read from it.
+- frontend chat settings include memory_enabled and context_length, but chat.py does not currently apply them to behavior.
+- evaluation/latency_tests.py appears out of sync with the current API routes.
+- some files in docs/ and examples/ are for explanation or testing, not for core runtime.
+
+
+19. Short summary
+
+If you want the simplest mental model:
+
+- FastAPI backend serves all logic.
+- Streamlit frontend is the user interface.
+- Structured routes answer direct data questions from CSV/JSON files.
+- Chat route is the smart pipeline:
+  guardrails -> cache -> memory -> RAG -> LLM -> memory saving
+- FAISS is used for document retrieval.
+- ChromaDB is used for long-term student memory.
+- Gemini is the LLM used to generate answers.
+
+
+20. Files that matter most for core runtime
+
+If you only care about the essential runtime files, focus on these:
+
+- backend/main.py
+- backend/routes/chat.py
+- backend/services/llm.py
+- backend/services/retriever.py
+- backend/services/memory.py
+- backend/services/memory_graph.py
+- backend/services/cache.py
+- backend/guardrails.py
+- frontend/app.py
+- frontend/components/chat_ui.py
+- utils/config.py
+- utils/file_loader.py
+- utils/text_splitter.py
+- utils/embeddings.py
+- create_index.py
+

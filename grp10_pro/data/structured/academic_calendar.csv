@@ -1,0 +1,8 @@
+program,event,date,description
+BTech,Semester Start,2026-01-10,Classes begin
+BTech,Mid Exam,2026-03-15,Mid semester exams
+BTech,End Exam,2026-05-20,Final exams
+BTech,Registration Deadline,2026-01-05,Last date to register
+MBA,Semester Start,2026-02-01,Classes begin
+MBA,End Exam,2026-06-10,Final exams
+PhD,Research Review,2026-04-15,Progress evaluation

@@ -1,0 +1,30 @@
+PLACEMENT PREPARATION GUIDELINES
+
+1. Eligibility:
+- Minimum CGPA: 6.5
+- No active backlogs
+
+2. Preparation Steps:
+- Learn DSA (Data Structures & Algorithms)
+- Practice coding on platforms like LeetCode
+- Prepare aptitude and reasoning
+
+3. Resume Guidelines:
+- Keep it 1 page
+- Highlight projects and internships
+
+4. Placement Process:
+- Online test
+- Technical interview
+- HR interview
+
+5. Important Rules:
+- Students can apply to multiple companies
+- Once selected, must follow placement policy
+
+6. Soft Skills:
+- Communication is very important
+- Practice mock interviews
+
+7. Internship Conversion:
+- Good performance in internship can lead to PPO

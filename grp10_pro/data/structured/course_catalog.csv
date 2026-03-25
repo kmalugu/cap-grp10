@@ -1,0 +1,7 @@
+course_code,course_name,program,credits,prerequisites,syllabus,lecture_timings
+AI101,Introduction to Artificial Intelligence,BTech,4,None,"AI basics, search algorithms, ML intro","Mon-Wed 10:00-11:30"
+DS201,Data Science Fundamentals,BTech,4,Math101,"Statistics, Python, data analysis","Tue-Thu 11:00-12:30"
+ML301,Machine Learning,BTech,4,AI101,"Regression, classification, clustering","Mon-Wed 2:00-3:30"
+DBMS202,Database Management Systems,BTech,3,None,"SQL, normalization, transactions","Tue-Thu 9:00-10:30"
+MBA101,Principles of Management,MBA,3,None,"Management basics, leadership","Mon-Fri 1:00-2:00"
+PH101,Research Methodology,PhD,3,None,"Research design, paper writing","Flexible"

@@ -1,0 +1,14 @@
+{
+  "CSE": {
+    "name": "Computer Science and Engineering",
+    "head": "Dr. Rao",
+    "building": "Block A",
+    "contact": "cse@university.edu"
+  },
+  "MBA": {
+    "name": "Management Studies",
+    "head": "Dr. Sharma",
+    "building": "Block B",
+    "contact": "mba@university.edu"
+  }
+}

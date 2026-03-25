@@ -1,0 +1,18 @@
+[
+  {
+    "query": "What is the minimum attendance required?",
+    "expected_answer": "75% attendance"
+  },
+  {
+    "query": "What is prerequisite for ML301?",
+    "expected_answer": "AI101"
+  },
+  {
+    "query": "When does semester start for BTech?",
+    "expected_answer": "2026-01-10"
+  },
+  {
+    "query": "What is library fine per day?",
+    "expected_answer": "₹5 per day"
+  }
+]

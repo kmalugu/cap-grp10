@@ -1,0 +1,24 @@
+{
+  "locations": [
+    {
+      "name": "CSE Department",
+      "coordinates": "12.9716,77.5946",
+      "description": "Block A - Computer Science"
+    },
+    {
+      "name": "Library",
+      "coordinates": "12.9720,77.5950",
+      "description": "Central Library"
+    },
+    {
+      "name": "Hostel",
+      "coordinates": "12.9730,77.5960",
+      "description": "Student Hostel Area"
+    },
+    {
+      "name": "Cafeteria",
+      "coordinates": "12.9710,77.5935",
+      "description": "Main Food Court"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+grp10_pro/
+|
++-- backend/            FastAPI backend
+|   +-- main.py         API entry point
+|   +-- guardrails.py   Input safety checks
+|   +-- routes/         API endpoints
+|   +-- services/       LLM, RAG, memory, cache logic
+|   +-- tools/          Structured-data helpers
+|
++-- frontend/           Streamlit UI
+|   +-- app.py          Frontend entry point
+|   +-- components/     UI sections
+|
++-- data/               Project data
+|   +-- rag_docs/       Files used for retrieval
+|   +-- structured/     CSV/JSON data for tools
+|   +-- memory/         Saved student memory JSON
+|
++-- models/             Generated vector databases
+|   +-- faiss_index/    RAG index built by create_index.py
+|   +-- chroma_db/      Long-term memory store
+|
++-- evaluation/         Optional evaluation scripts
+|
++-- docs/               Reference material and project docs
+|
++-- examples/           Demo scripts you can ignore unless testing features
+|
++-- utils/              Shared config, embeddings, loaders, splitters
+|
++-- create_index.py     Builds the FAISS index
++-- requirements.txt    Python dependencies
++-- .env                Local API keys and settings
+
+Start here if you want to understand the app:
+1. backend/main.py
+2. backend/routes/chat.py
+3. backend/services/
+4. frontend/app.py
+
+Folders you usually do not need to read first:
+- docs/
+- examples/
+- evaluation/
+- models/ (generated data)

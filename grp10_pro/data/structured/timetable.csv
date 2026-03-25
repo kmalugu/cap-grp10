@@ -1,0 +1,6 @@
+year,department,day,time,subject,room,type
+1,CSE,Monday,9:00-10:00,Math101,A101,Lecture
+1,CSE,Monday,10:00-11:00,AI101,A102,Lecture
+1,CSE,Tuesday,11:00-1:00,Physics Lab,Lab1,Lab
+2,CSE,Wednesday,2:00-3:30,DS201,B201,Lecture
+3,CSE,Thursday,9:00-10:30,ML301,B202,Lecture

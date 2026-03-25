@@ -1,0 +1,80 @@
+{
+  "violence": {
+    "severity": "critical",
+    "keywords": [
+      "hurt",
+      "kill",
+      "harm",
+      "attack",
+      "bomb",
+      "weapon",
+      "shoot"
+    ],
+    "message": "I cannot provide assistance with harmful or violent content. Please ask about legitimate university services instead."
+  },
+  "illegal": {
+    "severity": "critical",
+    "keywords": [
+      "hack",
+      "cheat exam",
+      "plagiarize",
+      "steal",
+      "drugs",
+      "bypass security"
+    ],
+    "message": "I cannot help with illegal activities. All academic work must follow university policies and laws."
+  },
+  "academic_dishonesty": {
+    "severity": "high",
+    "keywords": [
+      "copy homework",
+      "buy assignment",
+      "write my essay",
+      "cheat sheet",
+      "exam answers",
+      "do my work"
+    ],
+    "message": "I cannot assist with academic dishonesty. I can help you understand concepts, but the work must be your own."
+  },
+  "harassment": {
+    "severity": "critical",
+    "keywords": [
+      "bully",
+      "harass",
+      "threaten",
+      "racist",
+      "sexist",
+      "hate"
+    ],
+    "message": "I cannot assist with bullying, harassment, or discrimination. All university members must treat each other with respect."
+  },
+  "privacy_violation": {
+    "severity": "critical",
+    "keywords": [
+      "leak personal",
+      "share password",
+      "share email",
+      "doxx"
+    ],
+    "message": "I cannot help with accessing or sharing private information. Protect your own data and respect others' privacy."
+  },
+  "suspicious": {
+    "severity": "high",
+    "keywords": [
+      "bypass login",
+      "hack account",
+      "admin access",
+      "unauthorized access"
+    ],
+    "message": "I cannot assist with bypassing security measures. Please use official university channels."
+  },
+  "misinformation": {
+    "severity": "medium",
+    "keywords": [
+      "fake news",
+      "false information",
+      "make up story"
+    ],
+    "message": "I'm designed to provide accurate information. Please verify information from official sources."
+  }
+}
