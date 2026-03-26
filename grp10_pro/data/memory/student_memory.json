@@ -77,6 +77,18 @@
                 "timestamp": "2026-03-25T20:21:05.821999",
                 "conversation_length": 4,
                 "last_updated": "2026-03-25T20:21:05.821999"
+            },
+            "conv_1774498071": {
+                "student_id": "student_001",
+                "conversation_id": "conv_1774498071",
+                "summary": "The student asked about the hostel entry time. The advisor informed them that entry is allowed until 10:00 PM.",
+                "key_topics": [
+                    "Assistant's limitations regarding greetings",
+                    "Hostel entry timings"
+                ],
+                "timestamp": "2026-03-26T09:39:01.815064",
+                "conversation_length": 4,
+                "last_updated": "2026-03-26T09:39:01.815064"
             }
         }
     },
